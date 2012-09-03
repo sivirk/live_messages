@@ -1,1 +1,4 @@
 -e git+https://github.com/django/django.git#egg=django
+-e hg+https://bitbucket.org/andrewgodwin/south/#egg=South
+
+mysql-python

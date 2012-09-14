@@ -4,8 +4,7 @@ import os
 import sys
 
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
-
-sys.path.append(os.path.join(BASE_PATH, "../libs/"))
+sys.path.append(os.path.join(BASE_PATH, "../apps/"))
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -32,11 +31,11 @@ DATABASES = {
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Asia/Irkutsk'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 SITE_ID = 1
 
@@ -68,7 +67,7 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
-STATIC_URL = '/static/'
+STATIC_URL = '/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -137,6 +136,9 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     
     'south',
+
+
+    'registers',
     
 )
 

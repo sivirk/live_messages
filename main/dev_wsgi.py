@@ -1,8 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import uwsgi
-from uwsgidecorators import timer
 from django.utils import autoreload
+
+
+import os
+import sys
+
+BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(BASE_PATH, "../libs/"))
+
+from uwsgidecorators import timer
+
 
 @timer(1)
 def change_code_gracefull_reload(sig):
@@ -12,7 +21,6 @@ def change_code_gracefull_reload(sig):
 #django_wsgi.py
 import os
 import sys
-import warnings
 
 current = os.path.dirname(os.path.abspath(__file__))
 sys.path.extend([current, os.path.join(current, '../')])

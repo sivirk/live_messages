@@ -6,16 +6,21 @@ from django.db import models
 from django.contrib.auth.models import Group, User
 from django.contrib.contenttypes.models import ContentType
 
-from register.helpers 
+from registers.helpers import get_sub_models
+
+
+def get_tag_ct():
+    return map(lambda ct: ct.pk, get_sub_models(Tag))
 
 
 class Tag(models.Model):
     """ Теги для сообщений
-        Все модели наследуются от этой
     """
 
-    content_type = models.ForeignKey(ContentType, verbose_name=u'Тип',)
-    title = models.CharField(max_length=255, verbose_name=u'Заголовок')
+    content_type = models.ForeignKey(ContentType, verbose_name=u'Тип',
+                                     editable=False,)
+    title = models.CharField(max_length=255, verbose_name=u'Заголовок',
+                             editable=False,)
 
     class Meta:
         verbose_name = u"тег"
@@ -23,6 +28,12 @@ class Tag(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        """ Устанавливаем тип и заголовок для тега """
+        self.content_type = ContentType.objects.get_for_model(self)
+        self.title = unicode(self)
+        return super(Tag, self).save(*args, **kwargs)
 
 
 class Register(models.Model):
@@ -33,7 +44,10 @@ class Register(models.Model):
                                     null=True, blank=True)
     content_types = models.ManyToManyField(ContentType,
                                            verbose_name=u'Типы данных',
-                                           null=True, blank=True)
+                                           null=True, blank=True,
+                                           limit_choices_to={
+                                               'id__in': get_tag_ct()
+                                           })
     tags = models.ManyToManyField(Tag, verbose_name=u'Теги',
                                   null=True, blank=True)
 

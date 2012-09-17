@@ -10,4 +10,4 @@ local_settings.py
 .tmp/
 .settings/
 tmp/
-
+.ropeproject

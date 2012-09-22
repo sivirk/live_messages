@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+
 import uwsgi
 from django.utils import autoreload
-
 
 import os
 import sys
@@ -18,13 +18,7 @@ def change_code_gracefull_reload(sig):
     if autoreload.code_changed():
         uwsgi.reload()
 
-#django_wsgi.py
-import os
-import sys
-
-current = os.path.dirname(os.path.abspath(__file__))
-sys.path.extend([current, os.path.join(current, '../')])
-
+sys.path.extend([BASE_PATH, os.path.join(BASE_PATH, '../')])
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 

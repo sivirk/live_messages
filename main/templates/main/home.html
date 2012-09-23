@@ -1,9 +1,10 @@
 {% extends "main/base.html" %}
 {% block title %}Журналы{% endblock %}
 {% block body %}
-    <!-- Navbar
+
+    <!-- Навигация
     ================================================== -->
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-rostelecom navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
           <div class="brand">Журналы</div>
@@ -17,4 +18,27 @@
         </div>
       </div>
     </div>
+
+    <!-- Добавление сообщений
+    ================================================== -->
+    <div class="span4 well message-form">
+        {# <form accept-charset="UTF-8" action="" method="POST"> #}
+            <div class="row">
+              <div class="span8">
+                <textarea class="span4" id="new_message" name="new_message"
+                placeholder="Сообщение..." rows="5"></textarea>
+              </div>
+              <div class="span2">
+                <div class="btn-group btn-group-vertical" data-toggle="buttons-radio">
+                   <button class="btn btn-primary">Событие</button>
+                   <button class="btn btn-primary">Объявление</button>
+                   <button class="btn btn-primary">Описание</button>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-info" type="submit">Сохранить</button>
+        {# </form> #}
+    </div>
+
+
 {% endblock %}

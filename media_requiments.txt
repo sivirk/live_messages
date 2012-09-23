@@ -1,2 +1,4 @@
 https://github.com/cloudhead/less.js
 https://github.com/twitter/bootstrap.git
+https://github.com/jquery/jquery.git
+https://github.com/daffl/jqueryui.git

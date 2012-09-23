@@ -13,3 +13,5 @@ tmp/
 .ropeproject
 libs/bootstrap/
 libs/less.js/
+libs/jquery/
+libs/jquery-ui/

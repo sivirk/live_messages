@@ -1,5 +1,17 @@
 {% extends "main/base.html" %}
 {% block title %}Журналы{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script src="/js/main/main.js" type="text/javascript"></script>  
+{% endblock %}
+
+{% block styles %}
+  {{ block.super }}
+  <link href="/libs/jquery-ui/css/smoothness/jquery-ui-1.8.23.custom.css" rel="stylesheet">
+{% endblock %}
+
+
 {% block body %}
 
     <!-- Навигация

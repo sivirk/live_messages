@@ -1,4 +1,9 @@
+# Django
 -e git+https://github.com/django/django.git#egg=django
 -e hg+https://bitbucket.org/andrewgodwin/south/#egg=South
 
 mysql-python
+
+# Tornado
+-e git+https://github.com/facebook/tornado.git#egg=tornado
+-e git+https://github.com/mrjoes/sockjs-tornado.git#egg=sockjs-tornado

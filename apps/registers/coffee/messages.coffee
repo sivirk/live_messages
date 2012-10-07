@@ -4,11 +4,11 @@ OBJECT_TRIGGER = "#";
 triggered = false
 focus = false
 
-SIMPLE_ELEMENTS = ["ActionScript","AppleScript","Asp","BASIC","C","C++","Clojure","COBOL","ColdFusion","Erlang","Fortran","Groovy","Haskell","Java","JavaScript","Lisp","Perl","PHP","Python","Ruby","Scala","Scheme"];
-
 $(document).ready ->
     $("#new_message").autocomplete
-        source: SIMPLE_ELEMENTS
+        source: (request, response) ->
+            query_params = {'request': request.term}
+            window.link.query query_params, response
         # minLength: 0
         search: () ->
             return false if not triggered

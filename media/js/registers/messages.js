@@ -15,7 +15,7 @@
         query_params = {
           'request': request.term
         };
-        return window.link.query(query_params, response);
+        return window.link.query(query_params, response, true);
       },
       search: function() {
         if (!triggered) {

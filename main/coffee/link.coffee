@@ -5,23 +5,19 @@ class QueueManager
     constructor: () ->    
         @cache = {}
 
-    generate_name: () ->
-        return 'opa'
-
     register: (callback, tags, limit) ->
         # Регистрируем функцию callback
         # Может быть перманентная - то есть на несколько вызовов
         # @param callback: function
         # @param permanent:
 
-        tags = tags or this.generate_name()
+        tags = tags
         limit = limit or 1
 
         for tag in tags.split(",")
             if tag not in @cache
                 this.cache[tag] = []
             this.cache[tag].push {"fnc": callback, "limit": limit}
-        tags
 
     callback: (name, data) ->
         # Вызов функции обработчика с результатами
@@ -47,12 +43,14 @@ class Link
     @queues: false
 
     constructor: (@config) ->
-        this.connect()
+        config = SETTINGS.transport
+        this.connect config.address, config.port
         @queues = new QueueManager()
+        @reconnect = false
 
-    connect: ()->
+    connect: (address, port)->
         # Создание соединения
-        @transport = new SockJS('http://live_messages:9999/transport/')
+        @transport = new SockJS("http://#{ address }:#{ port }/transport/")
         @transport.onopen = ()->
             window.link.connected()
         @transport.onclose = ()->
@@ -71,28 +69,28 @@ class Link
     process_message: (e)->
         #Обработка сообщения
         data = $.parseJSON e.data
-        @queues.callback data['name'], data['result']
+        for tag, tag_data of data
+            @queues.callback tag, tag_data
 
-    query: (params, callback, is_blocking)->
+    query: (tag, params, callback)->
         # Запрос 
         # @param params - Парметры запроса
         # @param callback - Функция обработчик (имя или функция)
-        # @param block - Блокировать выполнение
+        # @param tag - тег функции
 
         is_blocking = is_blocking or false
 
         if typeof callback is 'function'
-            callback_name = @queues.register callback
-        else
-            callback_name = callback
+            @queues.register callback, tag
 
         data = {
             'params': params,
-            'name': callback_name
+            'tags': [tag]
         }
-
         message = JSON.stringify data
         @transport.send message
+    
+    
 
 $(document).ready ->
     window.link = new Link({})

@@ -8,13 +8,9 @@ QueueManager = (function() {
     this.cache = {};
   }
 
-  QueueManager.prototype.generate_name = function() {
-    return 'opa';
-  };
-
   QueueManager.prototype.register = function(callback, tags, limit) {
     var tag, _i, _len, _ref, _results;
-    tags = tags || this.generate_name();
+    tags = tags;
     limit = limit || 1;
     _ref = tags.split(",");
     _results = [];
@@ -32,14 +28,25 @@ QueueManager = (function() {
   };
 
   QueueManager.prototype.callback = function(name, data) {
-    var callback;
-    callback = this.cache[name];
-    callback['function'](data);
-    if (callback['limit']) {
-      callback['limit'] -= 1;
-      if (callback['limit'] === 0) {
-        return this.cache.pop(name);
+    var callback, callbacks, _i, _len, _results;
+    callbacks = this.cache[name];
+    if (callbacks) {
+      _results = [];
+      for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
+        callback = callbacks[_i];
+        callback['fnc'](data);
+        if (callback['limit']) {
+          callback['limit'] -= 1;
+          if (callback['limit'] === 0) {
+            _results.push(delete this.cache[name]);
+          } else {
+            _results.push(void 0);
+          }
+        } else {
+          _results.push(void 0);
+        }
       }
+      return _results;
     }
   };
 
@@ -59,12 +66,14 @@ Link = (function() {
 
   function Link(config) {
     this.config = config;
-    this.connect();
+    config = SETTINGS.transport;
+    this.connect(config.address, config.port);
     this.queues = new QueueManager();
+    this.reconnect = false;
   }
 
-  Link.prototype.connect = function() {
-    this.transport = new SockJS('http://live_messages:9999/transport/');
+  Link.prototype.connect = function(address, port) {
+    this.transport = new SockJS("http://" + address + ":" + port + "/transport/");
     this.transport.onopen = function() {
       return window.link.connected();
     };
@@ -88,21 +97,25 @@ Link = (function() {
   };
 
   Link.prototype.process_message = function(e) {
-    var data;
+    var data, tag, tag_data, _results;
     data = $.parseJSON(e.data);
-    return this.queues.callback(data['name'], data['result']);
+    _results = [];
+    for (tag in data) {
+      tag_data = data[tag];
+      _results.push(this.queues.callback(tag, tag_data));
+    }
+    return _results;
   };
 
-  Link.prototype.query = function(params, callback) {
-    var callback_name, data, message;
+  Link.prototype.query = function(tag, params, callback) {
+    var data, is_blocking, message;
+    is_blocking = is_blocking || false;
     if (typeof callback === 'function') {
-      callback_name = this.queues.register(callback);
-    } else {
-      callback_name = callback;
+      this.queues.register(callback, tag);
     }
     data = {
       'params': params,
-      'name': callback_name
+      'tags': [tag]
     };
     message = JSON.stringify(data);
     return this.transport.send(message);

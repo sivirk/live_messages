@@ -8,7 +8,7 @@ $(document).ready ->
     $("#new_message").autocomplete
         source: (request, response) ->
             query_params = {'request': request.term}
-            window.link.query query_params, response, true
+            window.link.query 'autocomplete', query_params, response
         search: () ->
             return false if not triggered
         select: (event, ui) ->

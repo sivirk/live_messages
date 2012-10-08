@@ -16,3 +16,4 @@ libs/less.js/
 libs/jquery/
 libs/jquery-ui/
 libs/socket.io/
+coffee/*.js

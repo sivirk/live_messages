@@ -15,7 +15,7 @@
         query_params = {
           'request': request.term
         };
-        return window.link.query(query_params, response, true);
+        return window.link.query('autocomplete', query_params, response);
       },
       search: function() {
         if (!triggered) {

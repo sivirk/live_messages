@@ -15,7 +15,11 @@
 
 
 {% block body %}
-
+    <script type="text/javascript">
+      {% autoescape off %}
+        var SETTINGS = {{ settings }};
+      {% endautoescape %}
+    </script>
     <!-- Навигация
     ================================================== -->
     <div class="navbar navbar-rostelecom navbar-fixed-top">

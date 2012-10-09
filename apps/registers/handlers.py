@@ -13,7 +13,12 @@ class AutocompleteHandler(MessageHandler):
         tags = ['autocomplete']
 
     def handle(self, tag, data, result_data):
-        return ["OPPPA", "GOPPA"]
+        q = data['request']
+        return map(lambda l: l.get('title'),
+                   self.db.query("""
+                                    SELECT title FROM registers_tag
+                                    where title like "%%s%"
+                                 """, q))
 
 
 class MessageHandler(MessageHandler):

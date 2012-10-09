@@ -121,6 +121,10 @@ Link = (function() {
     return this.transport.send(message);
   };
 
+  Link.prototype.subscribe = function(tags, callback) {
+    return this.queues.register(callback, tag);
+  };
+
   return Link;
 
 })();

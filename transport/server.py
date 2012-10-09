@@ -9,6 +9,7 @@ sys.path.append(os.path.join(BASE_PATH, "../"))
 
 from tornado import web, ioloop
 from sockjs.tornado import SockJSRouter, SockJSConnection
+import torndb
 
 from main import settings
 from messages import MessageManager
@@ -18,15 +19,28 @@ from clients import ClientManager
 class ClientConnection(SockJSConnection):
 
     def __init__(self, *args, **kwargs):
-        self.clients = ClientManager()
-        self.messages = MessageManager()
+        db_def = settings.DATABASES['default']
+        db_host = "%s:%s" % (db_def.get("HOST", 'localhost') or 'localhost',
+                             db_def.get("PORT", '3306') or '3306')
+        self.db = torndb.Connection(
+            host=db_host, database=db_def['NAME'],
+            user=db_def['USER'], password=db_def['PASSWORD'])
+
+        self.clients = ClientManager(self.db)
+        self.messages = MessageManager(self.db)
         super(ClientConnection, self).__init__(*args, **kwargs)
 
     def on_open(self, info):
-        self.clients.append(self, info)
+
+        client = self.clients.append(self, info)
+        if client and not client['user']:
+            return self.send(self.messages.error_message("auth.error"))
 
     def on_message(self, msg):
-        result = self.messages.handle_message(self.clients[self], msg)
+
+        client = self.clients[self]
+        result = self.messages.handle_message(client, msg)
+
         if result:
             self.send(result)
 
@@ -44,4 +58,3 @@ if __name__ == '__main__':
     logging.debug("Starting server on %s" % unicode(settings.TRANSPORT_SERVER))
     app.listen(**settings.TRANSPORT_SERVER)
     ioloop.IOLoop.instance().start()
-

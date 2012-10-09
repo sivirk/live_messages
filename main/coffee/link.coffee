@@ -90,7 +90,10 @@ class Link
         message = JSON.stringify data
         @transport.send message
     
-    
+    subscribe:(tag, callback) ->
+        # Подписаться на сообщения по тегам
+        @queues.register callback, tag
+
 
 $(document).ready ->
     window.link = new Link({})

@@ -47,8 +47,15 @@ class MessageHandlerMeta(type):
 class MessageHandler(six.with_metaclass(MessageHandlerMeta, object)):
     """ Базовый обработчик сообщений """
 
-    def __call__(self, tag, data, result_data):
-        return self.handle(tag, data, result_data)
+    def __init__(self, db):
+        self.db = db
 
-    def handle(self, tag, data, result_data):
+    def __call__(self, client, tag, data, result_data):
+        if hasattr(self, "handle_%s" % tag):
+            method = getattr(self, "handle_%s" % tag)
+            return method(tag, data, result_data)
+        else:
+            return self.handle(tag, data, result_data)
+
+    def handle(self, client, tag, data, result_data):
         raise NotImplementedError

@@ -23,43 +23,57 @@
         var SETTINGS = {{ settings }};
       {% endautoescape %}
     </script>
-    <!-- Навигация
-    ================================================== -->
-    <div class="navbar navbar-rostelecom navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <div class="brand">Журналы</div>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="">
-                <a href="">AXE</a>
-              </li>
-            </ul>
-          </div>
+
+  <div class="navbar navbar-fixed-top navbar-inverse">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="#">
+          Журналы
+        </a>
+        <ul class="nav">
+          <li>
+            <a href="#">
+              АТС 24
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              МТ 20
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              СоТУК
+            </a>
+          </li>
+        </ul>
+        <form class="navbar-form pull-right">
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="container message-conteiner">
+    <div class="hero-unit">
+        <div class="btn-group" data-toggle="buttons-radio">
+                     <button class="btn btn-primary">Событие</button>
+                     <button class="btn btn-primary">Объявление</button>
+                     <button class="btn btn-primary">Описание</button>
         </div>
+        <textarea id="message" class='message'  name="message" placeholder="Сообщение"></textarea>
+        <a class="btn" href="#">
+          Сохранить
+        </a>
+    </div>
+
+    <div class="event">
+      <div>
+        <p>
+          This is a template
+        </p>
       </div>
     </div>
 
-    <!-- Добавление сообщений
-    ================================================== -->
-    <div class="span4 well message-form">
-        {# <form accept-charset="UTF-8" action="" method="POST"> #}
-            <div class="row">
-              <div class="span8">
-                <textarea class="span4" id="new_message" name="new_message"
-                placeholder="Сообщение..." rows="5"></textarea>
-              </div>
-              <div class="span2">
-                <div class="btn-group btn-group-vertical" data-toggle="buttons-radio">
-                   <button class="btn btn-primary">Событие</button>
-                   <button class="btn btn-primary">Объявление</button>
-                   <button class="btn btn-primary">Описание</button>
-                </div>
-              </div>
-            </div>
-            <button class="btn btn-info" type="submit">Сохранить</button>
-        {# </form> #}
-    </div>
-
+  </div>
 
 {% endblock %}

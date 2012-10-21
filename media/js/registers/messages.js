@@ -9,7 +9,7 @@
   focus = false;
 
   $(document).ready(function() {
-    return $("#new_message").autocomplete({
+    return $("#message").autocomplete({
       source: function(request, response) {
         var query_params;
         query_params = {

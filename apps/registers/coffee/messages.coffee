@@ -5,7 +5,7 @@ triggered = false
 focus = false
 
 $(document).ready ->
-    $("#new_message").autocomplete
+    $("#message").autocomplete
         source: (request, response) ->
             query_params = {'request': request.term}
             window.link.query 'autocomplete', query_params, response

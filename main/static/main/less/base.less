@@ -3,16 +3,35 @@
 
 @import "navbar.less";
 
+.rounded-corners (@radius: 5px) {
+  border-radius: @radius;
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+}
+
 body {
   position: relative;
   padding-top: 38px;
-  background-color: #84CDE3;
 }
 
-.message-form {
-    width:80%;
-    margin-left: 7%;
-    textarea {
-        width:100%;
-    }
+#message {
+    width:90%;
+    height:100px;
+    margin-top:5px;
+}
+
+.message-conteiner{
+    margin-top:-40px;
+}
+
+
+.event {
+    color: #333;
+    background-color: #F7F7BA;
+    border:1px solid #EBEBB0;
+    padding:5px;
+    padding-top:10px;
+    padding-left: 20px;
+
+    .rounded-corners;
 }

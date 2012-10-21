@@ -142,6 +142,7 @@ INSTALLED_APPS = (
 
     'registers',
     'stations',
+    'utils',
     
 )
 

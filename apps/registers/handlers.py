@@ -17,8 +17,8 @@ class AutocompleteHandler(MessageHandler):
         return map(lambda l: l.get('title'),
                    self.db.query("""
                                     SELECT title FROM registers_tag
-                                    where title like "%%s%"
-                                 """, q))
+                                    where title like "%%%%%s%%%%"
+                                 """ % q))
 
 
 class MessageHandler(MessageHandler):

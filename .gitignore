@@ -17,3 +17,4 @@ libs/jquery/
 libs/jquery-ui/
 libs/socket.io/
 coffee/*.js
+node_modules

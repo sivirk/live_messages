@@ -16,8 +16,6 @@
 
   })();
 
-  $(document).ready(function() {
-    return window.auth = new Auth();
-  });
+  $(document).ready(function() {});
 
 }).call(this);

@@ -130,8 +130,8 @@
 
   })();
 
-  $(document).ready(function() {
-    return window.link = new Link({});
-  });
+  if (typeof APPS !== "undefined" && APPS !== null) {
+    APPS.Link = Link;
+  }
 
 }).call(this);

@@ -13,4 +13,3 @@ class Auth
 
 
 $(document).ready ->
-    window.auth = new Auth()

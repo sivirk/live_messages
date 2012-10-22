@@ -95,5 +95,4 @@ class Link
         @queues.register callback, tag
 
 
-$(document).ready ->
-    window.link = new Link({})
+APPS?.Link = Link

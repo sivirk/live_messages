@@ -1,5 +1,11 @@
 {% extends "main/application.html" %}
 
 {% block content %}
-
+    <div class='auth_form'>
+        {% include "main/snippets/auth_form.html" %}
+    </div>
+    <div class='content'>
+        {% include "main/snippets/toolbar.html" %}
+        {% include "main/snippets/message_form.html" %}
+    </div>
 {% endblock content %}

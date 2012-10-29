@@ -6,17 +6,23 @@ from django.utils.importlib import import_module
 
 from main import settings
 from transport.helpers import REGISTRY
+from base import BaseController
 
 
-class MessageManager(object):
+def json_converter(o):
+    if hasattr(o, 'to_json'):
+        return o.to_json()
+
+
+class MessageManager(BaseController):
     """ Обработка входящих сообщений
         от клиента
     """
 
     _handlers = {}
 
-    def __init__(self, db):
-        self.db = db
+    def __init__(self, application, handler):
+        super(MessageManager, self).__init__(application, handler)
         for app in settings.INSTALLED_APPS:
             if not app.startswith('django'):
                 try:
@@ -32,7 +38,8 @@ class MessageManager(object):
             for tag in handler._meta.tags:
                 if not tag in self._handlers:
                     self._handlers[tag] = []
-                self._handlers[tag].append((name, handler(self.db)))
+                self._handlers[tag].append((name, handler(self.application,
+                                                          self.handler)))
 
     def handle_message(self, client, message,):
         """ Обрабатываем входящее сообщение """
@@ -42,7 +49,7 @@ class MessageManager(object):
         for tag in tags:
             result.update(self.process_tag(client,
                           tag, data['params'], result))
-        return json.dumps(result)
+        return json.dumps(result, default=json_converter)
 
     def process_tag(self, client, tag, data, result):
         """ Обрабатываем тег """

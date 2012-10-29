@@ -33,8 +33,9 @@ class ApplicationMixin(TemplateView):
         libs = []
 
         app_name = app.split(".").pop()
+        app_path = app if app == 'main' else 'apps/%s' % app
         path = os.path.join(settings.BASE_PATH, "..",
-                            app.replace(".", "/"))
+                            app_path)
 
         less_path = os.path.join(path, "static", app_name, "less")
         coffee_path = os.path.join(path, "coffee")
@@ -43,7 +44,7 @@ class ApplicationMixin(TemplateView):
             less = self.get_files(less_path, 'less')
             less = map(lambda l: self.create_media_path(app, 'less', l), less)
 
-        if os.path.exists(less_path):
+        if os.path.exists(coffee_path):
             coffee = self.get_files(coffee_path, 'coffee')
             js = map(lambda x: x.replace(".coffee", ".js"), coffee)
             libs += map(lambda l: self.create_media_path('js', app, l), js)
@@ -89,6 +90,7 @@ class HomeView(ApplicationMixin, TemplateView):
         'registers',
         'stations',
         'utils',
+        'users',
     ]
 
     libs = [
@@ -103,6 +105,7 @@ class HomeView(ApplicationMixin, TemplateView):
 
         # Spine
         'spine/spine.js',
+        'spine/route.js',
     ]
 
 home = HomeView.as_view()

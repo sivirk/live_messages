@@ -16,6 +16,7 @@ class Options():
 class MessageHandlerMeta(type):
 
     def __new__(cls, name, bases, attrs):
+        global REGISTRY
         super_new = super(MessageHandlerMeta, cls).__new__
         parents = [b for b in bases if isinstance(b, MessageHandlerMeta) and
                    not (b.__name__ == 'NewBase' and b.__mro__ == (b, object))]
@@ -29,7 +30,6 @@ class MessageHandlerMeta(type):
 
         kwargs = {}
         kwargs['tags'] = getattr(attr_meta, 'tags')
-
         setattr(new_class, "_meta", Options(**kwargs))
 
         for attr, value in attrs.items():
@@ -37,25 +37,28 @@ class MessageHandlerMeta(type):
                 setattr(new_class, attr, value)
 
         name = new_class.__name__.lower()
-
         if name not in REGISTRY.keys():
             REGISTRY[name] = new_class
-
         return new_class
 
 
 class MessageHandler(six.with_metaclass(MessageHandlerMeta, object)):
     """ Базовый обработчик сообщений """
 
-    def __init__(self, db):
-        self.db = db
+    def __init__(self, application, handler):
+        self.application = application
+        self.handler = handler
+
+    @property
+    def db(self):
+        return self.application.db
 
     def __call__(self, client, tag, data, result_data):
-        if hasattr(self, "handle_%s" % tag):
+        if hasattr(self, "handle_%s" % tag.replace(".", "").replace(" ", "_")):
             method = getattr(self, "handle_%s" % tag)
-            return method(tag, data, result_data)
+            return method(client, tag, data, result_data)
         else:
-            return self.handle(tag, data, result_data)
+            return self.handle(client, tag, data, result_data)
 
     def handle(self, client, tag, data, result_data):
         raise NotImplementedError

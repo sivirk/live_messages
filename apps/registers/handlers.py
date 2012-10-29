@@ -12,7 +12,7 @@ class AutocompleteHandler(MessageHandler):
     class Meta:
         tags = ['autocomplete']
 
-    def handle(self, tag, data, result_data):
+    def handle(self, client, tag, data, result_data):
         q = data['request']
         return map(lambda l: l.get('title'),
                    self.db.query("""

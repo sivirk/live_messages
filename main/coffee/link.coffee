@@ -33,8 +33,8 @@ class QueueManager
     
     
 
-class Link
-    # Линк к TORNADO
+class Link extends Spine.Controller
+    # Линк к серверу transport
     # использует sockjs
 
     @connected: false
@@ -43,28 +43,32 @@ class Link
     @queues: false
 
     constructor: (@config) ->
-        config = SETTINGS.transport
-        this.connect config.address, config.port
+        @config = SETTINGS.transport
+        @connect()
         @queues = new QueueManager()
-        @reconnect = false
+        @reconnect = true
 
-    connect: (address, port)->
+    connect: ()->
         # Создание соединения
-        @transport = new SockJS("http://#{ address }:#{ port }/transport/")
-        @transport.onopen = ()->
-            window.link.connected()
-        @transport.onclose = ()->
-            window.link.disconnected()
-        @transport.onmessage = (e)->
-            window.link.process_message(e)
+        address = @config.address
+        port = @config.port
 
-    connected: ()->
+        @transport = new SockJS("http://#{ address }:#{ port }/transport/")
+        @transport.onopen = ()=>
+            @on_connected()
+        @transport.onclose = ()=>
+            @on_disconnected()
+        @transport.onmessage = (e)=>
+            @process_message(e)
+
+    on_connected: ()=>
         @connected = true
 
-    disconnected: ()->
+    on_disconnected: ()=>
         @connected = false
         if @reconnect
-            this.connect()
+            @transport = false
+            @connect()
 
     process_message: (e)->
         #Обработка сообщения
@@ -77,8 +81,6 @@ class Link
         # @param params - Парметры запроса
         # @param callback - Функция обработчик (имя или функция)
         # @param tag - тег функции
-
-        is_blocking = is_blocking or false
 
         if typeof callback is 'function'
             @queues.register callback, tag
@@ -94,5 +96,18 @@ class Link
         # Подписаться на сообщения по тегам
         @queues.register callback, tag
 
+    send_form: (form, callback) =>
+        # Функция для отправки форм на сервер
 
-APPS?.Link = Link
+        tag = form
+        data = $(form).serializeArray()
+        params = {}
+
+        # @todo: Если параметры списком
+        for row in data
+            params[row['name']] = row['value']
+        @query tag, params, callback
+    
+    
+
+this.transport_link = new Link()

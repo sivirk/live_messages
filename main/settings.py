@@ -143,13 +143,16 @@ INSTALLED_APPS = (
     'registers',
     'stations',
     'utils',
-    
+    'users',    
 )
 
 TRANSPORT_SERVER = {
     'address':'live_messages',
     'port':9999,
 }
+
+
+# AUTH_USER_MODEL = 'users.ProfileUser'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

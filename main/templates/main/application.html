@@ -1,3 +1,4 @@
+{% load str_utils %}
 <!DOCTYPE html>
 <html>
     <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# githubog: http://ogp.wme/ns/fb/githubog#">
@@ -21,15 +22,13 @@
 
     {% block content %}{% endblock %}
 
-    <div class='boot-overlay'>
-
-    </div>
+    <div class='boot-overlay'></div>
 
     {% block scripts %}
         <script type="text/javascript">
             {% autoescape  off %}    
             var SETTINGS = {{ settings }};
-            var APPS = {};
+            var application;
             Modernizr.load([
                 {
                     // test : Modernizr.fontface && Modernizr.canvas && Modernizr.cssgradients,
@@ -38,11 +37,16 @@
                 {
                     load: {{ media.apps }},
                     complete: function () {
-                        var body = $("body");
-                        var overlay = $(".boot-overlay");
-                        overlay.hide();
-                        body.removeClass('body-onload');
-                        var app = new APPS.Application({el: body});
+                        var body = $("body")
+                        var overlay = $(".boot-overlay")
+                        overlay.hide()
+                        body.removeClass('body-onload')
+                        application = new Application({
+                            el: body
+                            {% if request.user.is_authenticated %}
+                            ,user: {{ request.user.profile|to_json }}
+                            {% endif %}
+                        })
                     }
                 }
             ]);

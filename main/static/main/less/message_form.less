@@ -1,0 +1,174 @@
+
+.border-radius(@radius: 5px) {
+  border-radius: @radius;
+  -webkit-border-radius: @radius @radius;
+  -moz-border-radius: @radius;
+}
+
+
+.border-left(@radius: 5px) {
+  border-radius: @radius 0 0 @radius;
+  -webkit-border-radius: @radius 0 0 @radius;
+  -moz-border-radius: @radius 0 0 @radius;
+}
+
+.box-shadow(@style, @c) when (iscolor(@c)) {
+  box-shadow:         @style @c;
+  -webkit-box-shadow: @style @c;
+  -moz-box-shadow:    @style @c;
+}
+
+.box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) {
+  .box-shadow(@style, rgba(0, 0, 0, @alpha));
+}
+
+* html .ui-autocomplete {
+        position: absolute;
+    }
+
+// Основная форма сообщений
+.message-form{
+    width: 80%;
+    margin-left: 5%;
+
+    // Селектор типа сообщения
+    .message-type{
+        padding-left:30px;
+        width:100px;  
+        cursor:pointer;
+        background-position: left;
+        border-bottom: 1px dotted #fff;
+        &:hover{ border-bottom: 1px dotted #123; }
+    }
+    .type-pointed{
+        cursor: auto;
+        &:hover{ border-bottom: 1px dotted #fff; }   
+    }
+    .event{ background: url("/main/images/event.png") no-repeat;}
+    .adv{ background: url("/main/images/message.png") no-repeat;}
+    .info{ background: url("/main/images/info.png") no-repeat;}
+    .message-pointer{
+        width:100px;
+        padding-left: 20px;    
+        height:16px;
+    }
+    .pointed{
+        position:relative;
+        background: url("/main/images/pointer.png") no-repeat;
+        background-position: center;
+        z-index: 9999;
+    }
+
+
+    // Поле сообщения
+    .message-field{
+        position: relative;
+        margin: -1px;
+        border: 1px solid #8c8c8c;
+        width: 90%;
+        height: 100px;
+        padding-bottom: 5px;
+        z-index: 9;
+        .border-radius;        
+
+        textarea{
+            height:94px;
+            width:90%;
+            border:0;
+            resize:none;
+            letter-spacing: normal;
+            word-spacing: normal;
+            text-transform: none;
+            text-indent: 0px;
+            text-shadow: none;
+            display: inline-block;
+            text-align: -webkit-auto;
+            box-shadow:none;
+        }
+
+        .menu{
+            position:absolute;
+            background-color: #888181;
+            height:100%;
+            width:25px;
+            list-style: none;
+            top:0;
+            right:0;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+
+            li{
+                width:20px;
+                height:20px;
+                margin-top:5px;
+                cursor:pointer;
+                width:100%;
+                padding-top:2px;
+                padding-bottom:2px;
+                background-position: center;
+                &:hover{ background-color: #e0e0e0; }
+            }
+            .fullscreen{ background: url("/main/images/fullscreen.png") no-repeat; background-position: center;}
+            .attach{ background: url("/main/images/attach.png") no-repeat; background-position: center;}
+            .undo{ background: url("/main/images/undo.png") no-repeat;background-position: center;}
+        }
+
+        .submenu{
+            position:absolute;
+            background-color: #c2bfbf;
+            height:70%;
+            width:25px;
+            list-style: none;
+            top:15%;
+            right:25px;
+            .border-left(4px);
+
+            li {
+                width:20px;
+                height:20px;
+                margin-top:5px;
+                cursor:pointer;
+                width:100%;
+                padding-top:2px;
+                padding-bottom:2px;
+                &:hover{ background-color: #e0e0e0; }
+            }
+
+            .datepicker{ background: url("/main/images/datepicker.png") no-repeat; background-position: center; }
+        }
+        // Конец меню 
+    }
+    // Конец блока текстового поля
+
+    .actions {
+        margin-top:20px;
+
+        .tags{
+            padding-left: 10px;
+        }
+
+        .tag {
+            color:#646363;
+            border-bottom:1px dashed #646363;
+            cursor:pointer;
+            &:hover{ 
+                color: #e0e0e0;
+                border-bottom: 1px dashed #e0e0e0; 
+                text-decoration: line-through;
+            }
+        }
+
+        .add{
+            background: url("/main/images/add_tag.png") no-repeat;
+            background-position: center;
+            width:16px;
+            height:16px;
+            display: block;
+            float: left;
+            position: relative;
+            margin-right:10px;
+            cursor: pointer;
+        }
+    }
+
+}

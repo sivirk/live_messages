@@ -26,3 +26,12 @@ class MessageHandler(MessageHandler):
 
     class Meta:
         tags = ['message']
+
+
+class DairyListHandler(MessageHandler):
+
+    class Meta:
+        tags = ['get_dairy_list']
+
+    def handle(self, client, tag, data, result_data):
+        return [['AXE', 'axe'], ['MT', 'mt'], [u'Мои', 'my']]

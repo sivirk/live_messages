@@ -17,20 +17,24 @@ class Application extends Spine.Controller
 
         # Основные - root - урлы
         @routes
-            # Основная вьюха
+            # Сообщения
+            "/messages/:dairy/": (params) =>
+                @show_controller 'messages', {''}, params
             "/messages/": =>
                 @show_controller 'messages'
             # Авторизация
             "/login/": =>
                 @show_controller 'auth', {'redirect': location.hash}
-
+        Spine.Route.setup()
         # Проверяем аутентифицирован ли пользователь и показываем
         # основной контент - сообщения
         if @views['auth'].is_authentificated()
-            @navigate "/messages/"
+            if not location.hash
+                @navigate "/messages/"
+            else
+                @navigate "/gopa/"
         else
             @navigate "/login/"
-        Spine.Route.setup()
 
     next_url:=>
         return "/messages/"
@@ -63,7 +67,7 @@ class Application extends Spine.Controller
             else
                 screen.el.show()
 
-            screen.trigger "enter"
+            screen.trigger "enter", args...
             # Уведомляем другие контролы что показана вьюха
             for view_name, view of @views
                 if view != @currentview
@@ -85,5 +89,7 @@ class Application extends Spine.Controller
                         @show_controller action
                     else
                         @navigate "/messages/"
-
+        else
+            screen.trigger "update", args...
+            
 this.Application  = Application

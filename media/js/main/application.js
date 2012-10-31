@@ -34,6 +34,11 @@
         return _this.navigate("/login/");
       });
       this.routes({
+        "/messages/:dairy/": function(params) {
+          return _this.show_controller('messages', {
+            '': ''
+          }, params);
+        },
         "/messages/": function() {
           return _this.show_controller('messages');
         },
@@ -43,12 +48,16 @@
           });
         }
       });
+      Spine.Route.setup();
       if (this.views['auth'].is_authentificated()) {
-        this.navigate("/messages/");
+        if (!location.hash) {
+          this.navigate("/messages/");
+        } else {
+          this.navigate("/gopa/");
+        }
       } else {
         this.navigate("/login/");
       }
-      Spine.Route.setup();
     }
 
     Application.prototype.next_url = function() {
@@ -94,7 +103,7 @@
         } else {
           screen.el.show();
         }
-        screen.trigger("enter");
+        screen.trigger.apply(screen, ["enter"].concat(__slice.call(args)));
         _ref1 = this.views;
         for (view_name in _ref1) {
           view = _ref1[view_name];
@@ -119,6 +128,8 @@
             }
           });
         }
+      } else {
+        return screen.trigger.apply(screen, ["update"].concat(__slice.call(args)));
       }
     };
 

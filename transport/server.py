@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 
+import logging
 import os
 import sys
 
@@ -29,9 +30,7 @@ class ClientConnection(SockJSConnection):
 
     def on_message(self, msg):
         client = self.clients[self]
-        result = self.messages.handle_message(client, msg)
-        if result:
-            self.send(result)
+        self.messages.handle_message(client, msg)
 
     def on_close(self):
         self.clients.remove(self)
@@ -41,7 +40,6 @@ class MessagedApplication(web.Application):
     """ Приложение сообщений """
 
 if __name__ == '__main__':
-    import logging
     logging.getLogger().setLevel(logging.DEBUG)
     EchoRouter = SockJSRouter(ClientConnection, '/transport')
 

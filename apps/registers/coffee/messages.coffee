@@ -40,11 +40,11 @@ class Messages extends Spine.Controller
                 url = null
                 active = ''
                 for dairy in result
-                    dairy_name = dairy[1]
+                    dairy_name = dairy.slug
                     dairy_url = "/messages/#{dairy_name}/"
                     if not url
                         url = dairy_url
-                    dairy = $("<li class='dairy__#{dairy_name} #{active}'><a href='##{dairy_url}'>" + dairy[0] + "</a></li>")
+                    dairy = $("<li class='dairy__#{dairy_name} #{active}'><a href='##{dairy_url}'>" + dairy.title + "</a></li>")
                     dairy_list.append(dairy)
                 @navigate url
 

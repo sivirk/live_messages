@@ -53,7 +53,7 @@
         if (!location.hash) {
           this.navigate("/messages/");
         } else {
-          this.navigate("/gopa/");
+          this.navigate(location.hash);
         }
       } else {
         this.navigate("/login/");

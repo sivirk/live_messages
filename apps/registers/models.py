@@ -40,6 +40,7 @@ class Register(models.Model):
     """ Журналы сообщений """
 
     title = models.CharField(max_length=255, verbose_name=u'Название')
+    slug = models.SlugField(max_length=255, verbose_name=u'Slug')
     groups = models.ManyToManyField(Group, verbose_name=u'Для групп',
                                     null=True, blank=True)
     content_types = models.ManyToManyField(ContentType,

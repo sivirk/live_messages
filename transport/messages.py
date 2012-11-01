@@ -3,6 +3,7 @@
 import json
 
 from django.utils.importlib import import_module
+from tornado import gen
 
 from main import settings
 from transport.helpers import REGISTRY
@@ -27,7 +28,7 @@ class MessageManager(BaseController):
             if not app.startswith('django'):
                 try:
                     import_module("%s.handlers" % app)
-                except:
+                except ImportError:
                     pass
         self.update_handlers()
 
@@ -38,18 +39,25 @@ class MessageManager(BaseController):
             for tag in handler._meta.tags:
                 if not tag in self._handlers:
                     self._handlers[tag] = []
-                self._handlers[tag].append((name, handler(self.application,
-                                                          self.handler)))
+                self._handlers[tag].append((name, handler(self)))
 
+    @gen.engine
     def handle_message(self, client, message,):
         """ Обрабатываем входящее сообщение """
         data = json.loads(message)
         result = {}
         tags = data.pop('tags')
-        for tag in tags:
-            result.update(self.process_tag(client,
-                          tag, data['params'], result))
-        return json.dumps(result, default=json_converter)
+
+        def wrapper(*args, **kwargs):
+            callback = kwargs.pop('callback')
+            for tag in tags:
+                result.update(self.process_tag(client,
+                              tag, data['params'], result))
+            callback(result)
+
+        result = yield gen.Task(wrapper)
+        if result:
+            self.handler.send(json.dumps(result, default=json_converter))
 
     def process_tag(self, client, tag, data, result):
         """ Обрабатываем тег """

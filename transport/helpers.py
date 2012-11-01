@@ -45,13 +45,16 @@ class MessageHandlerMeta(type):
 class MessageHandler(six.with_metaclass(MessageHandlerMeta, object)):
     """ Базовый обработчик сообщений """
 
-    def __init__(self, application, handler):
-        self.application = application
-        self.handler = handler
+    def __init__(self, controller):
+        self.controller = controller
 
     @property
     def db(self):
-        return self.application.db
+        return self.controller.db
+
+    @property
+    def asyncdb(self):
+        return self.controller.asyncdb
 
     def __call__(self, client, tag, data, result_data):
         if hasattr(self, "handle_%s" % tag.replace(".", "").replace(" ", "_")):
@@ -62,3 +65,8 @@ class MessageHandler(six.with_metaclass(MessageHandlerMeta, object)):
 
     def handle(self, client, tag, data, result_data):
         raise NotImplementedError
+
+    # def handle(self, client, tag, data, result_data):
+    #     return self.db.query("""
+    #         select title, slug from registers_register
+    #     """)

@@ -32,7 +32,7 @@ class Application extends Spine.Controller
             if not location.hash
                 @navigate "/messages/"
             else
-                @navigate "/gopa/"
+                @navigate location.hash
         else
             @navigate "/login/"
 

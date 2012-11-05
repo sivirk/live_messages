@@ -9,15 +9,32 @@ class MessagesForm extends Spine.Controller
     events:
         "click .message-type": "change_type"
         "click .save-btn": "save"
+        "click .tags .add": "add_tags"
 
     constructor: ->
         super
         @start_autocomplete()
 
+    add_tags:(e) =>
+        # ...
+
+    
+
     save:(e) ->
         # Добавление - сохранение сообщения
-    
-    
+        text = $(".message").val()
+        if text
+            purpose = $(".type-pointed").attr("class").split(" ")[3]
+            tags = $(".tags .tag").map (e) ->
+                $(this).attr("--data-tag")
+            tags = tags.get()
+            # if purpose in ["event", "announce"]
+            message = new Message(
+                    text: text
+                    purpose: purpose
+                    tags: tags
+            )
+            message.save()
 
     change_type: (e) ->
         # Смена типа сообщения

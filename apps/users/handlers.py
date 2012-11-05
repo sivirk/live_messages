@@ -11,8 +11,10 @@ class AuthFormHandler(MessageHandler):
 
     def handle(self, client, tag, data, result_data):
         if not client.is_authenticated():
-            if self.handler.clients.authenticate(client, data['auth-username'],
-                                                 data['auth-password']):
+            if self.controller.handler.clients.authenticate(
+                client, data['auth-username'],
+                data['auth-password']
+            ):
                 return {'success': True, 'user': client}
             else:
                 return {'success': False}
@@ -25,4 +27,4 @@ class LogOutHandler(MessageHandler):
         tags = ['logout']
 
     def handle(self, client, tag, data, result_data):
-        return {'success': self.handler.clients.logout(client)}
+        return {'success': self.controller.handler.clients.logout(client)}

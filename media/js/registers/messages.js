@@ -18,6 +18,10 @@
       this.on_update = __bind(this.on_update, this);
 
       this.update = __bind(this.update, this);
+
+      this.insert = __bind(this.insert, this);
+
+      var _this = this;
       Messages.__super__.constructor.apply(this, arguments);
       this.title = 'Журналы';
       this.form = new MessagesForm({
@@ -25,7 +29,20 @@
       });
       this.bind("enter", this.on_show);
       this.bind("update", this.on_update);
+      Message.bind("created", function(message) {
+        return _this.insert(message);
+      });
     }
+
+    Messages.prototype.insert = function(message, index) {
+      var _this = this;
+      if (index == null) {
+        index = 0;
+      }
+      return templates.render_object(message, function(html) {
+        return console.log(html);
+      });
+    };
 
     Messages.prototype.update = function(params) {
       var dairy_list;
@@ -56,7 +73,7 @@
       }
       dairy_list = $(".dairy-list");
       if (!$("li", dairy_list).length) {
-        return transport_link.query('get_dairy_list', {}, function(result) {
+        return transport_link.query('dairy', {}, function(result) {
           var active, dairy, dairy_name, dairy_url, url, _i, _len;
           url = null;
           active = '';

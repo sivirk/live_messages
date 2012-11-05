@@ -5,12 +5,19 @@ from django.utils import six
 REGISTRY = {}
 
 
+class OptionDoesNotExist(Exception):
+    pass
+
+KEYS = ['db_table']
+
+
 class Options():
 
     tags = []
 
-    def __init__(self, tags,):
-        self.tags = tags
+    def __init__(self, *args, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
 
 class MessageHandlerMeta(type):
@@ -30,6 +37,10 @@ class MessageHandlerMeta(type):
 
         kwargs = {}
         kwargs['tags'] = getattr(attr_meta, 'tags')
+
+        if hasattr(attr_meta, 'db_table'):
+            kwargs['db_table'] = getattr(attr_meta, 'db_table')
+
         setattr(new_class, "_meta", Options(**kwargs))
 
         for attr, value in attrs.items():
@@ -56,17 +67,39 @@ class MessageHandler(six.with_metaclass(MessageHandlerMeta, object)):
     def asyncdb(self):
         return self.controller.asyncdb
 
-    def __call__(self, client, tag, data, result_data):
-        if hasattr(self, "handle_%s" % tag.replace(".", "").replace(" ", "_")):
-            method = getattr(self, "handle_%s" % tag)
-            return method(client, tag, data, result_data)
+    def __call__(self, client, tag, method, data, result_data):
+        tag_method = tag.replace(".", "").replace(" ", "_")
+        if hasattr(self, "handle_%s" % method):
+            method = getattr(self, "handle_%s" % method)
+            result = method(client, tag, data, result_data)
+        elif hasattr(self, "handle_%s" % tag_method):
+            method = getattr(self, "handle_%s" % tag_method)
+            result = method(client, tag, data, result_data)
         else:
-            return self.handle(client, tag, data, result_data)
+            result = self.handle(client, tag, data, result_data)
+
+        if type(result) is bool:
+            return {'success': result}
+        return result
 
     def handle(self, client, tag, data, result_data):
-        raise NotImplementedError
+        if self._meta.db_table:
+            # Если нет данных то поиск по полям
+            if not data:
+                return self.db.query("""
+                    select title, slug from registers_register
+                """)
+            else:
+                where = " and ".join(map(
+                    lambda x: "%s='%s'" % (x[0], x[1]),
+                    data.items())
+                )
+                return self.db.query("""
+                    select title, slug from registers_register where %s
+                """ % where)
 
-    # def handle(self, client, tag, data, result_data):
-    #     return self.db.query("""
-    #         select title, slug from registers_register
-    #     """)
+    def handle_post(self, client, tag, data, result_data):
+        """ Обработка POST метода
+            создание новой записи в таблице
+        """
+        return {'id': 123, 'created': 'asdas'}

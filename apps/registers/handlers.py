@@ -3,8 +3,6 @@
 """ Работа с сообщениями
 """
 
-from tornado import gen
-
 from transport.helpers import MessageHandler
 
 
@@ -28,14 +26,11 @@ class MessageHandler(MessageHandler):
 
     class Meta:
         tags = ['message']
+        db_table = 'register_message'
 
 
-class DairyListHandler(MessageHandler):
+class DairyHandler(MessageHandler):
 
     class Meta:
-        tags = ['get_dairy_list']
-
-    def handle(self, client, tag, data, result_data):
-        return self.db.query( """
-            select title, slug from registers_register
-        """)
+        tags = ['dairy']
+        db_table = 'register_registers'

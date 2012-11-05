@@ -1,4 +1,3 @@
-
 class Messages extends Spine.Controller
     # Сообщения
     @extend(Spine.Events)
@@ -7,8 +6,20 @@ class Messages extends Spine.Controller
         super
         @title = 'Журналы'
         @form = new MessagesForm({el: ".message-form"})
+
         @bind "enter", @on_show
         @bind "update", @on_update
+
+        Message.bind "created", (message)=>
+            @insert message
+        
+
+    insert:(message, index=0)=>
+        # Добавляем новое сообщение
+        templates.render_object message, (html) =>
+            # Вставляем html после index сообщения
+            console.log html
+        
 
     update: (params) =>
         # ...
@@ -35,7 +46,7 @@ class Messages extends Spine.Controller
         dairy_list  = $(".dairy-list")
         if not $("li", dairy_list).length
             # Обновляем Журналы
-            transport_link.query 'get_dairy_list', {}, (result) =>
+            transport_link.query 'dairy', {}, (result) =>
                 # Обновляем список всех журналов выбирая 1-ый
                 url = null
                 active = ''

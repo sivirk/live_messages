@@ -76,7 +76,7 @@ class Link extends Spine.Controller
         for tag, tag_data of data
             @queues.callback tag, tag_data
 
-    query: (tag, params, callback)->
+    query: (tag, params, callback, method='get')->
         # Запрос 
         # @param params - Парметры запроса
         # @param callback - Функция обработчик (имя или функция)
@@ -87,7 +87,8 @@ class Link extends Spine.Controller
 
         data = {
             'params': params,
-            'tags': [tag]
+            'tags': [tag],
+            'method': method
         }
         message = JSON.stringify data
         @transport.send message
@@ -95,6 +96,12 @@ class Link extends Spine.Controller
     subscribe:(tag, callback) ->
         # Подписаться на сообщения по тегам
         @queues.register callback, tag
+
+    post:(tag, data, callback) =>
+        # Пост данных на сервер
+        callback_ = (result) =>
+            callback(result, data)
+        @query tag, data, callback_, 'post'
 
     send_form: (form, callback) =>
         # Функция для отправки форм на сервер
@@ -107,7 +114,33 @@ class Link extends Spine.Controller
         for row in data
             params[row['name']] = row['value']
         @query tag, params, callback
+
+class Singleton
+    constructor: (@record) ->
+        @model = @record.constructor
+
+Include = 
+    ajax: -> new Singleton(this)
     
-    
+TransportModel = 
+    # Расширение для моделей, что бы сохранять
+    # и получать данные через линк
+
+    extended: ->
+        @change @transport_change
+        # @include Include
+
+    transport_change: (record, type, options) =>
+        # Вызываем при изменении модели
+        model = record.constructor.className.toLowerCase()
+        if type is 'create'
+            transport_link.post model, record, (data, post_data) =>
+                if data?.id
+                    record.changeID(data.id)
+                    for field, value of data
+                        if field != 'id'
+                            record[field] = value
+                    record.trigger('created',)
 
 this.transport_link = new Link()
+this.TransportModel = TransportModel

@@ -35,11 +35,12 @@ class MessageManager(BaseController):
     def update_handlers(self,):
         """ Обновляет таблицу обработки сообщений """
 
-        for name, handler in REGISTRY.items():
-            for tag in handler._meta.tags:
-                if not tag in self._handlers:
-                    self._handlers[tag] = []
-                self._handlers[tag].append((name, handler(self)))
+        if not self._handlers:
+            for name, handler in REGISTRY.items():
+                for tag in handler._meta.tags:
+                    if not tag in self._handlers:
+                        self._handlers[tag] = []
+                    self._handlers[tag].append((name, handler(self)))
 
     @gen.engine
     def handle_message(self, client, message,):
@@ -47,19 +48,20 @@ class MessageManager(BaseController):
         data = json.loads(message)
         result = {}
         tags = data.pop('tags')
+        method = data.get('method', 'get')
 
         def wrapper(*args, **kwargs):
             callback = kwargs.pop('callback')
             for tag in tags:
                 result.update(self.process_tag(client,
-                              tag, data['params'], result))
+                              tag, method, data['params'], result))
             callback(result)
 
         result = yield gen.Task(wrapper)
         if result:
             self.handler.send(json.dumps(result, default=json_converter))
 
-    def process_tag(self, client, tag, data, result):
+    def process_tag(self, client, tag, method, data, result):
         """ Обрабатываем тег """
         if not tag in result:
             result[tag] = None
@@ -67,7 +69,7 @@ class MessageManager(BaseController):
         handlers = self._handlers.get(tag)
         if handlers:
             for name, handler in handlers:
-                result[tag] = handler(client, tag, data, result)
+                result[tag] = handler(client, tag, method, data, result)
         return result
 
     def error_message(self, tags='exception', message=None):

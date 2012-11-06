@@ -3,12 +3,11 @@
 from django.utils import six
 
 REGISTRY = {}
+MODEL_ATTRS = ['db_table', 'model', 'list_props', 'save_props', 'order_by']
 
 
 class OptionDoesNotExist(Exception):
     pass
-
-KEYS = ['db_table']
 
 
 class Options():
@@ -38,11 +37,10 @@ class MessageHandlerMeta(type):
         kwargs = {}
         kwargs['tags'] = getattr(attr_meta, 'tags')
 
-        if hasattr(attr_meta, 'db_table'):
-            kwargs['db_table'] = getattr(attr_meta, 'db_table')
+        for attr in MODEL_ATTRS:
+            kwargs[attr] = getattr(attr_meta, attr, None)
 
         setattr(new_class, "_meta", Options(**kwargs))
-
         for attr, value in attrs.items():
             if attr not in ['Meta', ]:
                 setattr(new_class, attr, value)
@@ -82,24 +80,62 @@ class MessageHandler(six.with_metaclass(MessageHandlerMeta, object)):
             return {'success': result}
         return result
 
+    def get_object_data(self, client, data):
+        """ На основе переданных данных
+            возвращает данные для нового объекта
+        """
+        return data
+
+    def get_object_dict(self, obj, props=None):
+        """ Возвращает словарь на основе данных
+            объекта из запрошенных свойств
+        """
+        obj_dict = {}
+        if not props:
+            obj_dict = obj.__dict__.copy()
+            del obj_dict['_sa_instance_state']
+            obj_dict['unicode'] = unicode(obj)
+        else:
+            for prop in props:
+                if hasattr(obj, prop):
+                    value = getattr(obj, prop)
+                    obj_dict[prop] = value
+                elif prop == 'unicode':
+                    obj_dict[prop] = unicode(obj)
+        return obj_dict
+
     def handle(self, client, tag, data, result_data):
-        if self._meta.db_table:
-            # Если нет данных то поиск по полям
-            if not data:
-                return self.db.query("""
-                    select title, slug from registers_register
-                """)
+        if self._meta.model:
+            qs = self.controller.al_session.query(self._meta.model)
+            if data:
+                # @TODO: Сделать фильтр!
+                objects = qs.filter()
             else:
-                where = " and ".join(map(
-                    lambda x: "%s='%s'" % (x[0], x[1]),
-                    data.items())
+                objects = qs
+
+            if self._meta.order_by:
+                objects = objects.order_by(self._meta.order_by)
+            else:
+                objects = objects.order_by(self._meta.model.id)
+
+            # @todo: Выборка результатов должна быть в соответствии с
+            #        необходимыми параметрами list_props
+            result = []
+            for o in objects:
+                result.append(
+                    self.get_object_dict(o, self._meta.list_props)
                 )
-                return self.db.query("""
-                    select title, slug from registers_register where %s
-                """ % where)
+            return result
 
     def handle_post(self, client, tag, data, result_data):
         """ Обработка POST метода
             создание новой записи в таблице
         """
-        return {'id': 123, 'created': 'asdas'}
+
+        kwargs = self.get_object_data(client, data)
+        if 'id' in kwargs:
+            del kwargs['id']
+        obj = self._meta.model(**kwargs)
+        self.controller.al_session.add(obj)
+        self.controller.al_session.commit()
+        return self.get_object_dict(obj, self._meta.save_props)

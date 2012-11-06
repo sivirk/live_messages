@@ -7,6 +7,11 @@ class Messages extends Spine.Controller
         @title = 'Журналы'
         @form = new MessagesForm({el: ".message-form"})
 
+        $(".message-event").live "mouseover", (e) ->
+            $(".message-actions",@).show()
+        $(".message-event").live "mouseout", (e) ->
+            $(".message-actions",@).hide()
+
         @bind "enter", @on_show
         @bind "update", @on_update
 
@@ -18,7 +23,7 @@ class Messages extends Spine.Controller
         # Добавляем новое сообщение
         templates.render_object message, (html) =>
             # Вставляем html после index сообщения
-            console.log html
+            $(".messages-list").prepend($(html))
         
 
     update: (params) =>
@@ -52,10 +57,11 @@ class Messages extends Spine.Controller
                 active = ''
                 for dairy in result
                     dairy_name = dairy.slug
+                    id = dairy.id
                     dairy_url = "/messages/#{dairy_name}/"
                     if not url
                         url = dairy_url
-                    dairy = $("<li class='dairy__#{dairy_name} #{active}'><a href='##{dairy_url}'>" + dairy.title + "</a></li>")
+                    dairy = $("<li class='dairy__#{dairy_name} #{active}' --data-id='#{id}'><a href='##{dairy_url}'>" + dairy.title + "</a></li>")
                     dairy_list.append(dairy)
                 @navigate url
 

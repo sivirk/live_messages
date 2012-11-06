@@ -1,1 +1,25 @@
--{{ text }}-
+
+    <div class='message-event type-alarm'>
+        <div class='label-block'>
+            <div class='verticalText label-description'>Событие</div>
+        </div>
+        <div class="message-main-body">
+            <div class='message-date'>{{ created }}</div>
+            <div class='message-content'>{{ text }}</div>
+            <div class='message-tags'>
+                {{#tags}}
+                    <span class='tag-before'></span>
+                    <span class='tag'>{{.}}</span>
+                    <span class='tag-after'></span>
+                {{/tags}}
+            </div>
+            <div class='actions-block'>
+                <ul class='message-actions'>
+                    <li><a href="">Дополнительная информация</a></li>
+                    <li><a href="">Комментарии</a></li>
+                    <li><a href="">Редактировать</a></li>
+                    <li><a href="">Закрыть</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>

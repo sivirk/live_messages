@@ -4,6 +4,7 @@
 """
 
 from transport.helpers import MessageHandler
+from registers.al_models import Message, Tag, Dairy
 
 
 class AutocompleteHandler(MessageHandler):
@@ -24,13 +25,33 @@ class AutocompleteHandler(MessageHandler):
 class MessageHandler(MessageHandler):
     """ Обработчик для сообщений """
 
+    PURPOSE = {
+        'event': 1,
+        'announce': 2,
+        'description': 3,
+    }
+
     class Meta:
         tags = ['message']
-        db_table = 'register_message'
+        model = Message
+        save_props = ['id']
+
+    def get_object_data(self, client, data):
+        kwargs = data.copy()
+        kwargs['purpose'] = self.PURPOSE.get(str(kwargs['purpose']))
+        kwargs['user_id'] = client.user['_auth_user_id']
+
+        tags = []
+        tags_qs = self.controller.al_session.query(Tag)
+        for tag in kwargs['tags']:
+            tags.append(tags_qs)
+        del kwargs['tags']
+        kwargs['tags'] = tags
+        return kwargs
 
 
 class DairyHandler(MessageHandler):
 
     class Meta:
         tags = ['dairy']
-        db_table = 'register_registers'
+        model = Dairy

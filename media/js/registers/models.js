@@ -12,7 +12,7 @@
       return Message.__super__.constructor.apply(this, arguments);
     }
 
-    Message.configure("Message", "text", "purpose", "tags", "created");
+    Message.configure("Message", "text", "purpose", "tags", "created", "register_id");
 
     Message.extend(TransportModel);
 

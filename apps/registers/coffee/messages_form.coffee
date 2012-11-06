@@ -15,6 +15,14 @@ class MessagesForm extends Spine.Controller
         super
         @start_autocomplete()
 
+        Message.bind "created", (message)=>
+            @reset()
+
+    reset:(e) =>
+        # Очистка формы
+        $(".message").val("")
+        
+
     add_tags:(e) =>
         # ...
 
@@ -24,15 +32,20 @@ class MessagesForm extends Spine.Controller
         # Добавление - сохранение сообщения
         text = $(".message").val()
         if text
+            register_id = $(".dairy-list .active").attr("--data-id")
             purpose = $(".type-pointed").attr("class").split(" ")[3]
             tags = $(".tags .tag").map (e) ->
-                $(this).attr("--data-tag")
+                {
+                    id: $(this).attr("--data-id")
+                }
             tags = tags.get()
+
             # if purpose in ["event", "announce"]
             message = new Message(
                     text: text
                     purpose: purpose
-                    tags: tags
+                    tags: tags,
+                    register_id: register_id
             )
             message.save()
 

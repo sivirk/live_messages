@@ -23,25 +23,40 @@
 
     function MessagesForm() {
       this.add_tags = __bind(this.add_tags, this);
+
+      this.reset = __bind(this.reset, this);
+
+      var _this = this;
       MessagesForm.__super__.constructor.apply(this, arguments);
       this.start_autocomplete();
+      Message.bind("created", function(message) {
+        return _this.reset();
+      });
     }
+
+    MessagesForm.prototype.reset = function(e) {
+      return $(".message").val("");
+    };
 
     MessagesForm.prototype.add_tags = function(e) {};
 
     MessagesForm.prototype.save = function(e) {
-      var message, purpose, tags, text;
+      var message, purpose, register_id, tags, text;
       text = $(".message").val();
       if (text) {
+        register_id = $(".dairy-list .active").attr("--data-id");
         purpose = $(".type-pointed").attr("class").split(" ")[3];
         tags = $(".tags .tag").map(function(e) {
-          return $(this).attr("--data-tag");
+          return {
+            id: $(this).attr("--data-id")
+          };
         });
         tags = tags.get();
         message = new Message({
           text: text,
           purpose: purpose,
-          tags: tags
+          tags: tags,
+          register_id: register_id
         });
         return message.save();
       }

@@ -87,4 +87,4 @@ class Message(models.Model):
         verbose_name_plural = u"сообщения"
 
     def __unicode__(self):
-        pass
+        return self.text

@@ -27,6 +27,12 @@
       this.form = new MessagesForm({
         el: ".message-form"
       });
+      $(".message-event").live("mouseover", function(e) {
+        return $(".message-actions", this).show();
+      });
+      $(".message-event").live("mouseout", function(e) {
+        return $(".message-actions", this).hide();
+      });
       this.bind("enter", this.on_show);
       this.bind("update", this.on_update);
       Message.bind("created", function(message) {
@@ -40,7 +46,7 @@
         index = 0;
       }
       return templates.render_object(message, function(html) {
-        return console.log(html);
+        return $(".messages-list").prepend($(html));
       });
     };
 
@@ -74,17 +80,18 @@
       dairy_list = $(".dairy-list");
       if (!$("li", dairy_list).length) {
         return transport_link.query('dairy', {}, function(result) {
-          var active, dairy, dairy_name, dairy_url, url, _i, _len;
+          var active, dairy, dairy_name, dairy_url, id, url, _i, _len;
           url = null;
           active = '';
           for (_i = 0, _len = result.length; _i < _len; _i++) {
             dairy = result[_i];
             dairy_name = dairy.slug;
+            id = dairy.id;
             dairy_url = "/messages/" + dairy_name + "/";
             if (!url) {
               url = dairy_url;
             }
-            dairy = $(("<li class='dairy__" + dairy_name + " " + active + "'><a href='#" + dairy_url + "'>") + dairy.title + "</a></li>");
+            dairy = $(("<li class='dairy__" + dairy_name + " " + active + "' --data-id='" + id + "'><a href='#" + dairy_url + "'>") + dairy.title + "</a></li>");
             dairy_list.append(dairy);
           }
           return _this.navigate(url);

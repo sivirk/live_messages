@@ -109,10 +109,13 @@
     };
 
     Link.prototype.on_disconnected = function() {
+      var _this = this;
       this.connected = false;
       if (this.reconnect) {
-        this.transport = false;
-        return this.connect();
+        return setTimeout(function() {
+          _this.transport = false;
+          return _this.connect();
+        }, 1000);
       }
     };
 

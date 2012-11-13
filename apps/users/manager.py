@@ -6,6 +6,8 @@ import datetime
 import hmac
 import hashlib
 
+from django.utils.crypto import get_random_string
+
 from main import settings
 from base import BaseController
 from users.client import Client
@@ -21,7 +23,17 @@ class ClientManager(BaseController):
     connections = {}
 
     def __getitem__(self, key):
-        return self.connections[key]
+        if key in self.connections:
+            return self.connections[key]
+
+    def update_session(self, client,):
+        if 'sessionid' in client.info.cookies:
+            expire = datetime.datetime.now() + datetime.timedelta(14)
+            session = client.info.cookies['sessionid'].value
+            self.db.execute("""
+                        update django_session set expire_date=%s
+                        where session_key=%s
+                    """, expire, session)
 
     def authenticate(self, client, username, password):
         info = self.db.get("""
@@ -37,13 +49,40 @@ class ClientManager(BaseController):
             }
             client.user = auth_data
             data = self.encode(auth_data)
-            session = client.info.cookies['sessionid'].value
+            expire = datetime.datetime.now() + datetime.timedelta(14)
+            if 'sessionid' in client.info.cookies:
+                session = client.info.cookies['sessionid'].value
+            else:
+                session = self.generate_session_key()
+                client.info.cookies['sessionid'] = session
+                client.info.cookies['sessionid']['expires'] = expire
+                client.info.cookies['sessionid']['path'] = '/'
+                client.info.cookies['sessionid']['domain'] = None
+                client.info.cookies['sessionid']['value'] = session
+                self.db.execute("""
+                insert into django_session
+                (`session_key`, `session_data`, `expire_date`)
+                values (%s, '', %s)
+                """, session, expire)
 
             self.db.execute("""
-                    update django_session set session_data="%s"
-                    where session_key="%s"
-                """ % (data, session))
+                    update django_session set session_data=%s, expire_date=%s
+                    where session_key=%s
+                """, data, expire, session)
         return bool(auth_data)
+
+    def generate_session_key(self,):
+        hex_chars = '1234567890abcdef'
+        while True:
+            session_key = get_random_string(32, hex_chars)
+            if not self.exists(session_key):
+                break
+        return session_key
+
+    def exists(self, session_key):
+        return self.db.get("""
+                    select 1 from django_session where session_key="%s"
+                """ % session_key)
 
     def logout(self, client):
         session = client.info.cookies['sessionid'].value
@@ -59,9 +98,10 @@ class ClientManager(BaseController):
         session = self.db.get("""
                         select * from django_session where session_key="%s"
                     """ % session)
-        now = datetime.datetime.now()
-        if session and session['expire_date'] > now:
+        # now = datetime.datetime.now()
+        if session:
             return self.decode(session['session_data'])
+        return {}
 
     def encode(self, session_dict):
         "Returns the given session dictionary pickled and encoded as a string."
@@ -80,7 +120,7 @@ class ClientManager(BaseController):
             else:
                 return pickle.loads(pickled)
         except Exception:
-            pass
+            return {}
 
     def _hash(self, value):
         key_salt = "django.contrib.sessionsSessionStore"
@@ -108,14 +148,20 @@ class ClientManager(BaseController):
             try:
                 user = self.get_user(session)
             except ValueError:
-                user = None
+                user = {}
             if client not in self.connections.keys():
                 self.connections[client] = Client(**{
                     'info': info,
                     'user': user,
                     'manager': self,
                 })
-                return self.connections[client]
+        else:
+            self.connections[client] = Client(**{
+                'info': info,
+                'user': {},
+                'manager': self,
+            })
+        return self.connections[client]
 
     def remove(self, client):
         """ Удаление клиента """

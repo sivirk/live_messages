@@ -18,11 +18,13 @@ class TemplateManager extends Spine.Controller
                 @templates[template_name] = data.template
                 callback(data.template)
 
-    render_object: (object, callback)=>
+    render_objects: (objects..., callback)=>
         # Рендерит модель или список
-        template = object.constructor.className.toLowerCase()
-        template = "#{template}/client/read.html"
-        return @render(template, object, callback)
+        object_name = objects[0].constructor.className.toLowerCase()
+        is_objects_same = (o.constructor.className.toLowerCase()==object_name for o in objects).reduce (f,n)=> f&&n
+        if is_objects_same
+            template = "#{object_name}/client/read.html"
+            return @render(template, {'objects': objects}, callback)
     
 
     render: (template, context, callback) =>
@@ -30,9 +32,15 @@ class TemplateManager extends Spine.Controller
         # @todo: Сделать протухание шаблонов
         if SETTINGS.debug or not @templates[template]
             @load_template template, (template) =>
-                callback(Mustache.render(template, context))
+                if context.objects
+                    (callback(Mustache.render(template, o)) for o in context.objects)
+                else
+                    callback(Mustache.render(template, context))
         else
             template = @templates[template]
-            callback(Mustache.render(template, context))
+            if context.objects
+                (callback(Mustache.render(template, o)) for o in context.objects)
+            else
+                callback(Mustache.render(template, context))
 
 this.templates = new TemplateManager()

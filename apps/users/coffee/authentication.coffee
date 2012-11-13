@@ -18,9 +18,8 @@ class Auth extends Spine.Controller
         transport_link.subscribe 'auth.error', @go_authentificate
 
     is_authentificated: =>
-        # ...
         if @user?.user_id
-            return true
+            true
         else
             false
     
@@ -48,6 +47,8 @@ class Auth extends Spine.Controller
             # Обрабатываем ответ авторизации
             if result.success
                 @user = result.user
+                $.cookies.set( 'sessionid', result.sessionid,)
+                # setCookie("sessionid", result.sessionid, result.session_exp, "/")
                 @trigger "exit"
             else
                 

@@ -15,7 +15,13 @@ class AuthFormHandler(MessageHandler):
                 client, data['auth-username'],
                 data['auth-password']
             ):
-                return {'success': True, 'user': client}
+
+                return {
+                    'success': True,
+                    'user': client,
+                    'sessionid': client.info.cookies['sessionid'].value,
+                    # 'session_exp': sexp.strftime("%a, %d-%b-%Y %H:%M:%S GMT")
+                }
             else:
                 return {'success': False}
 

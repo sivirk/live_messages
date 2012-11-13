@@ -17,6 +17,8 @@
 
       this.on_update = __bind(this.on_update, this);
 
+      this.update_message_list = __bind(this.update_message_list, this);
+
       this.update = __bind(this.update, this);
 
       this.insert = __bind(this.insert, this);
@@ -40,14 +42,13 @@
       });
     }
 
-    Messages.prototype.insert = function(message, index) {
-      var _this = this;
-      if (index == null) {
-        index = 0;
-      }
-      return templates.render_object(message, function(html) {
+    Messages.prototype.insert = function() {
+      var message,
+        _this = this;
+      message = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      return templates.render_objects.apply(templates, __slice.call(message).concat([function(html) {
         return $(".messages-list").prepend($(html));
-      });
+      }]));
     };
 
     Messages.prototype.update = function(params) {
@@ -56,8 +57,31 @@
       $("li", dairy_list).removeClass('active');
       $(".dairy__" + params.dairy).addClass('active');
       if ($(".dairy__" + params.dairy).length) {
-        return 'asda';
+        return this.update_message_list();
       }
+    };
+
+    Messages.prototype.update_message_list = function() {
+      var dairy, params,
+        _this = this;
+      dairy = $(".dairy-list .active").attr("--data-id");
+      params = {
+        'register_id': dairy,
+        'page': 1
+      };
+      return transport_link.query('message', params, function(result) {
+        var message, messages;
+        messages = (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = result.length; _i < _len; _i++) {
+            message = result[_i];
+            _results.push(new Message(message));
+          }
+          return _results;
+        })();
+        return _this.insert.apply(_this, messages);
+      });
     };
 
     Messages.prototype.on_update = function() {

@@ -80,7 +80,7 @@ class MessageHandler(six.with_metaclass(MessageHandlerMeta, object)):
             return {'success': result}
         return result
 
-    def get_object_data(self, client, data):
+    def update_object_data(self, client, data):
         """ На основе переданных данных
             возвращает данные для нового объекта
         """
@@ -113,7 +113,7 @@ class MessageHandler(six.with_metaclass(MessageHandlerMeta, object)):
             else:
                 objects = qs
 
-            if self._meta.order_by:
+            if self._meta.order_by is not None:
                 objects = objects.order_by(self._meta.order_by)
             else:
                 objects = objects.order_by(self._meta.model.id)
@@ -132,7 +132,7 @@ class MessageHandler(six.with_metaclass(MessageHandlerMeta, object)):
             создание новой записи в таблице
         """
 
-        kwargs = self.get_object_data(client, data)
+        kwargs = self.update_object_data(client, data)
         if 'id' in kwargs:
             del kwargs['id']
         obj = self._meta.model(**kwargs)

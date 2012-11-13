@@ -63,6 +63,7 @@
       transport_link.send_form(".login-form form", function(result) {
         if (result.success) {
           _this.user = result.user;
+          $.cookies.set('sessionid', result.sessionid);
           return _this.trigger("exit");
         } else {
 

@@ -35,8 +35,9 @@ class MessageHandler(MessageHandler):
         tags = ['message']
         model = Message
         save_props = ['id']
+        order_by = Message.id.asc()
 
-    def get_object_data(self, client, data):
+    def update_object_data(self, client, data):
         kwargs = data.copy()
         kwargs['purpose'] = self.PURPOSE.get(str(kwargs['purpose']))
         kwargs['user_id'] = client.user['_auth_user_id']

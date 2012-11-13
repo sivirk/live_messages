@@ -67,8 +67,10 @@ class Link extends Spine.Controller
     on_disconnected: ()=>
         @connected = false
         if @reconnect
-            @transport = false
-            @connect()
+            setTimeout =>
+                @transport = false
+                @connect()
+            , 1000
 
     process_message: (e)->
         #Обработка сообщения

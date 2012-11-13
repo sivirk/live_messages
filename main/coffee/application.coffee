@@ -24,7 +24,11 @@ class Application extends Spine.Controller
                 @show_controller 'messages'
             # Авторизация
             "/login/": =>
-                @show_controller 'auth', {'redirect': location.hash}
+                if location.hash != '#/login/'
+                    @show_controller 'auth', {'redirect': location.hash}
+                else
+                    @show_controller 'auth'
+
         Spine.Route.setup()
         # Проверяем аутентифицирован ли пользователь и показываем
         # основной контент - сообщения
@@ -43,12 +47,10 @@ class Application extends Spine.Controller
     show_controller:(screen='messages', options={}, args...) =>
         # Меняем экран вызывая соответствующий view
         # @TODO: Переход между вьюхами, анимация
-
         if typeof screen is 'string'
             screen = @views[screen]
         
         $(".open").removeClass("open")
-
         # Меняем текущую вьюху на новую
         if @currentview != screen
             show_effect = false

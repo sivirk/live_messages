@@ -19,12 +19,11 @@ class Messages extends Spine.Controller
             @insert message
         
 
-    insert:(message, index=0)=>
+    insert:(message...)=>
         # Добавляем новое сообщение
-        templates.render_object message, (html) =>
+        templates.render_objects message..., (html) =>
             # Вставляем html после index сообщения
             $(".messages-list").prepend($(html))
-        
 
     update: (params) =>
         # ...
@@ -32,8 +31,20 @@ class Messages extends Spine.Controller
         $("li", dairy_list).removeClass('active')
         $(".dairy__#{params.dairy}").addClass('active')
         if $(".dairy__#{params.dairy}").length
-            'asda'
-            
+            @update_message_list()
+    
+    update_message_list: =>
+        # Обновляем текуший список сообщений
+        dairy = $(".dairy-list .active").attr("--data-id")
+        params = {
+            'register_id': dairy,
+            'page': 1
+        }
+        transport_link.query 'message', params, (result) =>
+            messages = (new Message(message) for message in result)
+            @insert messages...
+
+        
 
     on_update:(args...) =>
         # Обновление списка

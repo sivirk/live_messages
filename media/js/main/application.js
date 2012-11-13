@@ -43,9 +43,13 @@
           return _this.show_controller('messages');
         },
         "/login/": function() {
-          return _this.show_controller('auth', {
-            'redirect': location.hash
-          });
+          if (location.hash !== '#/login/') {
+            return _this.show_controller('auth', {
+              'redirect': location.hash
+            });
+          } else {
+            return _this.show_controller('auth');
+          }
         }
       });
       Spine.Route.setup();

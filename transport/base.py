@@ -22,7 +22,7 @@ class BaseController(object):
         engine = create_engine(
             'mysql://%(USER)s:%(PASSWORD)s@%(HOST)s/%(NAME)s' %
             db_settings, pool_recycle=3600, encoding='UTF-8',
-            convert_unicode=True)
+            convert_unicode=True,)
 
         Session = sessionmaker(bind=engine)
         al_session = Session()

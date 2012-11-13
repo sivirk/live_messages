@@ -3,7 +3,8 @@
   var TemplateManager,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __slice = [].slice;
 
   TemplateManager = (function(_super) {
 
@@ -12,7 +13,7 @@
     function TemplateManager() {
       this.render = __bind(this.render, this);
 
-      this.render_object = __bind(this.render_object, this);
+      this.render_objects = __bind(this.render_objects, this);
 
       this.load_template = __bind(this.load_template, this);
       TemplateManager.__super__.constructor.apply(this, arguments);
@@ -35,22 +36,61 @@
       });
     };
 
-    TemplateManager.prototype.render_object = function(object, callback) {
-      var template;
-      template = object.constructor.className.toLowerCase();
-      template = "" + template + "/client/read.html";
-      return this.render(template, object, callback);
+    TemplateManager.prototype.render_objects = function() {
+      var callback, is_objects_same, o, object_name, objects, template, _i,
+        _this = this;
+      objects = 2 <= arguments.length ? __slice.call(arguments, 0, _i = arguments.length - 1) : (_i = 0, []), callback = arguments[_i++];
+      object_name = objects[0].constructor.className.toLowerCase();
+      is_objects_same = ((function() {
+        var _j, _len, _results;
+        _results = [];
+        for (_j = 0, _len = objects.length; _j < _len; _j++) {
+          o = objects[_j];
+          _results.push(o.constructor.className.toLowerCase() === object_name);
+        }
+        return _results;
+      })()).reduce(function(f, n) {
+        return f && n;
+      });
+      if (is_objects_same) {
+        template = "" + object_name + "/client/read.html";
+        return this.render(template, {
+          'objects': objects
+        }, callback);
+      }
     };
 
     TemplateManager.prototype.render = function(template, context, callback) {
-      var _this = this;
+      var o, _i, _len, _ref, _results,
+        _this = this;
       if (SETTINGS.debug || !this.templates[template]) {
         return this.load_template(template, function(template) {
-          return callback(Mustache.render(template, context));
+          var o, _i, _len, _ref, _results;
+          if (context.objects) {
+            _ref = context.objects;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              o = _ref[_i];
+              _results.push(callback(Mustache.render(template, o)));
+            }
+            return _results;
+          } else {
+            return callback(Mustache.render(template, context));
+          }
         });
       } else {
         template = this.templates[template];
-        return callback(Mustache.render(template, context));
+        if (context.objects) {
+          _ref = context.objects;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            o = _ref[_i];
+            _results.push(callback(Mustache.render(template, o)));
+          }
+          return _results;
+        } else {
+          return callback(Mustache.render(template, context));
+        }
       }
     };
 

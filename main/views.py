@@ -97,6 +97,8 @@ class HomeView(ApplicationMixin, TemplateView):
         # Основные библиотеки
         'sockjs-0.3.min.js',
         'jquery-1.8.2.min.js',
+        'jaaulde.cookies.js',
+        'jquery.cookies.js',
         'mustache.js',
         'jquery-ui/jquery-ui-1.9.0.min.js',
         'jquery-ui/smoothness/jquery-ui-1.9.0.min.css',
